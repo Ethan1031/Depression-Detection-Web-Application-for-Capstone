@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EEG Depression Detection</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 50px;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+      h1 {
+        color: #333;
+      }
+      input[type="file"] {
+        margin-top: 15px;
+        margin-bottom: 15px;
+      }
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #result {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-top: 20px;
+      }
+      .error {
+        color: red;
+        font-size: 14px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Upload EEG Signal File (.edf)</h1>
+      <form id="uploadForm">
+        <input type="file" id="fileInput" accept=".edf" required />
+        <br />
+        <button type="submit">Upload & Predict</button>
+      </form>
+      <div id="result"></div>
+      <div id="errorMessage" class="error"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const fileInput = document.getElementById("fileInput").files[0];
+          const resultDiv = document.getElementById("result");
+          const errorDiv = document.getElementById("errorMessage");
+
+          resultDiv.innerHTML = "";
+          errorDiv.innerHTML = "";
+
+          if (!fileInput) {
+            errorDiv.innerHTML = "⚠️ Please select a .edf file.";
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("file", fileInput);
+
+          try {
+            const response = await fetch("/predict", {
+              method: "POST",
+              body: formData,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              resultDiv.innerHTML = `Prediction: <strong>${data.prediction}</strong>`;
+            } else {
+              errorDiv.innerHTML = `⚠️ Error: ${data.error}`;
+              console.error("Error Traceback:", data.traceback);
+            }
+          } catch (error) {
+            errorDiv.innerHTML = "⚠️ Error in prediction. Please try again.";
+            console.error("Fetch Error:", error);
+          }
+        });
+    </script>
+  </body>
+</html>
