@@ -3,85 +3,99 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EEG Depression Detection</title>
-    <style>
-      body {
-        font-family: "Arial", sans-serif;
-        background-color: #f4f4f4;
-        text-align: center;
-        padding: 50px;
-      }
-      .container {
-        background: white;
-        padding: 20px;
-        max-width: 400px;
-        margin: auto;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-      }
-      h1 {
-        color: #333;
-      }
-      input[type="file"] {
-        margin-top: 15px;
-        margin-bottom: 15px;
-      }
-      button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        cursor: pointer;
-        border-radius: 5px;
-        font-size: 16px;
-      }
-      button:hover {
-        background-color: #0056b3;
-      }
-      #result {
-        font-size: 18px;
-        font-weight: bold;
-        color: #333;
-        margin-top: 20px;
-      }
-      .error {
-        color: red;
-        font-size: 14px;
-        margin-top: 10px;
-      }
-    </style>
+    <title>EEG Depression Detection System</title>
   </head>
   <body>
-    <div class="container">
-      <h1>Upload EEG Signal File (.edf)</h1>
-      <form id="uploadForm">
-        <input type="file" id="fileInput" accept=".edf" required />
-        <br />
-        <button type="submit">Upload & Predict</button>
-      </form>
-      <div id="result"></div>
-      <div id="errorMessage" class="error"></div>
-    </div>
+    <header>
+      <h1>EEG Depression Detection System</h1>
+      <h2>Upload EEG Data for Analysis</h2>
+    </header>
+
+    <main>
+      <section>
+        <h3>Instructions:</h3>
+        <ol>
+          <li>Please ensure your EEG file is in .edf format</li>
+          <li>The file should contain the required EEG channels</li>
+          <li>Each recording should be at least 10 seconds long</li>
+          <li>Wait for the analysis to complete after uploading</li>
+        </ol>
+      </section>
+
+      <section>
+        <form id="uploadForm">
+          <fieldset>
+            <legend>Upload EEG File</legend>
+            <p>
+              <label for="eegFile">Select EEG File (.edf):</label><br />
+              <input
+                type="file"
+                id="eegFile"
+                name="file"
+                accept=".edf"
+                required
+              />
+            </p>
+            <p>
+              <button type="submit">Analyze EEG</button>
+            </p>
+          </fieldset>
+        </form>
+      </section>
+
+      <section>
+        <div id="loadingMessage" style="display: none">
+          <p>
+            <strong
+              >Processing... Please wait while we analyze your EEG data.</strong
+            >
+          </p>
+        </div>
+
+        <div id="resultSection" style="display: none">
+          <h3>Analysis Results:</h3>
+          <p><strong>Diagnosis: </strong><span id="predictionResult"></span></p>
+          <p>
+            <strong>Confidence: </strong><span id="confidenceResult"></span>%
+          </p>
+          <p>
+            <strong>Segments Analyzed: </strong
+            ><span id="segmentsResult"></span>
+          </p>
+        </div>
+
+        <div id="errorMessage" style="display: none">
+          <p style="color: red">
+            <strong>Error: </strong><span id="errorText"></span>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <hr />
+      <p>
+        <small
+          >Note: This system is intended for research purposes only and should
+          not be used as a sole diagnostic tool.</small
+        >
+      </p>
+    </footer>
 
     <script>
       document
         .getElementById("uploadForm")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
-          const fileInput = document.getElementById("fileInput").files[0];
-          const resultDiv = document.getElementById("result");
-          const errorDiv = document.getElementById("errorMessage");
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-          resultDiv.innerHTML = "";
-          errorDiv.innerHTML = "";
-
-          if (!fileInput) {
-            errorDiv.innerHTML = "⚠️ Please select a .edf file.";
-            return;
-          }
+          // Hide previous results and show loading
+          document.getElementById("resultSection").style.display = "none";
+          document.getElementById("errorMessage").style.display = "none";
+          document.getElementById("loadingMessage").style.display = "block";
 
           const formData = new FormData();
-          formData.append("file", fileInput);
+          const fileField = document.getElementById("eegFile");
+          formData.append("file", fileField.files[0]);
 
           try {
             const response = await fetch("/predict", {
@@ -89,17 +103,31 @@
               body: formData,
             });
 
-            const data = await response.json();
+            const result = await response.json();
 
-            if (response.ok) {
-              resultDiv.innerHTML = `Prediction: <strong>${data.prediction}</strong>`;
+            // Hide loading message
+            document.getElementById("loadingMessage").style.display = "none";
+
+            if (result.error) {
+              // Show error message
+              document.getElementById("errorText").textContent = result.error;
+              document.getElementById("errorMessage").style.display = "block";
             } else {
-              errorDiv.innerHTML = `⚠️ Error: ${data.error}`;
-              console.error("Error Traceback:", data.traceback);
+              // Show results
+              document.getElementById("predictionResult").textContent =
+                result.prediction;
+              document.getElementById("confidenceResult").textContent =
+                result.confidence;
+              document.getElementById("segmentsResult").textContent =
+                result.segments_analyzed;
+              document.getElementById("resultSection").style.display = "block";
             }
           } catch (error) {
-            errorDiv.innerHTML = "⚠️ Error in prediction. Please try again.";
-            console.error("Fetch Error:", error);
+            // Hide loading and show error
+            document.getElementById("loadingMessage").style.display = "none";
+            document.getElementById("errorText").textContent =
+              "An error occurred during file upload. Please try again.";
+            document.getElementById("errorMessage").style.display = "block";
           }
         });
     </script>
