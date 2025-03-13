@@ -1,7 +1,7 @@
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from .routers import auth, users, predictions, phq9
+from .routers import auth, users, phq9_prediction
 from .database import engine
 from . import models
 
@@ -19,7 +19,7 @@ app = FastAPI(
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -28,8 +28,7 @@ app.add_middleware(
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
-app.include_router(predictions.router, prefix="/api/predictions", tags=["Predictions"])
-app.include_router(phq9.router, prefix="/api/phq9", tags=["PHQ-9"])
+app.include_router(phq9_prediction.router, prefix="/api/assessment", tags=["Combined Assessment"])
 
 @app.get("/", tags=["Root"])
 async def root():
@@ -45,8 +44,7 @@ async def root():
             "available_endpoints": {
                 "authentication": "/api/auth",
                 "users": "/api/users",
-                "predictions": "/api/predictions",
-                "phq9": "/api/phq9"
+                "assessment": "/api/assessment"
             }
         }
     )

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EEG Upload | MindLoom</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0px;
+        flex-direction: column;
+      }
+      .navbar {
+        position: relative;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #dde5ed;
+        color: #1d3853;
+        padding: 15px;
+        font-weight: bold;
+        font-size: 20px;
+      }
+
+      .logo-profile {
+        display: flex;
+        align-items: center;
+        margin-left: 20px;
+      }
+
+      .nav-links-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 200px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: #1d3853;
+      }
+
+      .profile-link {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-right: 50px;
+      }
+
+      .profile img {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+      }
+
+      .profile-name {
+        font-weight: lighter;
+        color: #1d3853;
+      }
+
+      .content {
+        display: flex;
+        flex: 1;
+
+        min-height: calc(
+          100vh - 80px
+        ); /* Adjusts height to fit within viewport */
+        align-items: stretch;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+      }
+      .upload-section {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 450px;
+        text-align: center;
+      }
+      h1 {
+        color: #287272;
+      }
+      .upload-box {
+        border: 2px dashed #287272;
+        border-radius: 10px;
+        padding: 20px;
+        cursor: pointer;
+        color: #287272;
+        font-weight: 600;
+        margin-top: 10px;
+        width: 100%;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: -25px;
+        margin-bottom: auto;
+        align-self: flex-start; /* Keeps it from stretching */
+      }
+
+      .upload-box:hover {
+        background-color: #eaf4f4;
+      }
+      #file-name {
+        margin-top: 30px;
+        font-size: 14px;
+        color: #333;
+      }
+      input[type="file"] {
+        display: none;
+      }
+      .submit-btn {
+        margin-top: 15px;
+        padding: 10px 20px;
+        border: none;
+        background-color: #287272;
+        color: white;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .submit-btn:hover {
+        background-color: #1d5656;
+      }
+      .instructions {
+        background-color: #287272;
+        background-image: url("images/background.png");
+        background-size: cover;
+        color: white;
+        padding: 20px;
+        width: 300px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        border-bottom: 1px solid #f4f4f4;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .footer {
+        position: fixed;
+        background-color: #1d3853;
+        padding: 5px 50px;
+        color: #fcfefd;
+        font-family: "Poppins", sans-serif;
+        /* Center the footer */
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      .footer-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        min-height: 40px;
+      }
+
+      .footer-links {
+        flex-grow: 1;
+        text-align: center;
+        font-size: 14px;
+        line-height: 1; /* Reduce line height */
+        margin: 5px 0; /* Reduce margin if needed */
+      }
+
+      .footer-links a {
+        color: #fcfefd;
+        text-decoration: none;
+        font-weight: 400;
+        margin: 0 8px;
+        font-size: 14px;
+      }
+
+      .footer-links a:not(:last-child)::after {
+        content: "|";
+        color: white;
+        margin-left: 10px;
+      }
+
+      .footer-links a:hover {
+        color: #dde5ed;
+      }
+
+      .footer-icons {
+        width: 150px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .footer-icons img {
+        width: 24px;
+        height: 24px;
+        filter: brightness(0) invert(1);
+        transition: opacity 0.3s ease;
+      }
+
+      .footer-icons a:hover img {
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="logo-profile">MindLoom</div>
+      <div class="nav-links-container">
+        <nav class="nav-links">
+          <a href="landing-page.html" class="active">Home</a>
+          <a href="dashboard.html" class="active">Dashboard</a>
+        </nav>
+      </div>
+      <a href="profile-settings.html" class="profile-link">
+        <div class="profile logo-profile">
+          <img
+            src="images/profile-pic.png"
+            alt="User Profile"
+            class="profile-img"
+          />
+          <span class="profile-name">John Doe</span>
+        </div>
+      </a>
+    </header>
+    <div class="content">
+      <div class="container">
+        <h1>EEG Data Upload</h1>
+        <div class="upload-section">
+          <label class="upload-box" for="file-upload"
+            >Browse files to upload</label
+          >
+          <input
+            type="file"
+            id="file-upload"
+            accept=".edf"
+          />
+          <p id="file-name">No file chosen</p>
+          <button class="submit-btn">Submit</button>
+        </div>
+      </div>
+      <div class="instructions">
+        <h2>Upload Instructions</h2>
+        <p>1. Click the "Browse files" area to select your EEG file.</p>
+        <hr />
+        <p>2. Only .edf files are allowed.</p>
+        <hr />
+        <p>3. Once selected, click "Submit" to upload.</p>
+        <hr />
+        <p>4. Ensure your file is correctly formatted before submission.</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-container">
+        <div class="footer-icons"></div>
+        <div class="footer-links">
+          <a href="contact-us.html">Contact Us</a>
+          <a href="terms-and-conditions.html">Terms & Privacy</a>
+          <a href="privacy-policy.html">Security</a>
+        </div>
+        <div class="footer-icons">
+          <a href="#"><img src="images/Facebook.png" alt="Facebook" /></a>
+          <a href="#"><img src="images/Twitter.png" alt="Twitter" /></a>
+          <a href="#"><img src="images/Instagram.png" alt="Instagram" /></a>
+        </div>
+      </div>
+    </div>
+
+    <script src="eeg-upload.js"></script>
+
+  </body>
+</html>

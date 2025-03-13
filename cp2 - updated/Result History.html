@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assessment Results | MindLoom</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Include auth-check.js for authentication -->
+    <script src="auth-check.js"></script>
+    <style>
+      .results-container {
+        max-width: 800px;
+        margin: 30px auto;
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .result-section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .result-section:last-child {
+        border-bottom: none;
+      }
+
+      .result-section h2,
+      .result-section h3 {
+        color: #287272;
+        margin-bottom: 15px;
+      }
+
+      .result-card {
+        background-color: #f5f5f5;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+
+      .score {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1d3853;
+      }
+
+      .category {
+        font-size: 18px;
+        margin: 5px 0;
+        color: #287272;
+      }
+
+      .prediction {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1d3853;
+      }
+
+      .confidence {
+        font-style: italic;
+        color: #666;
+      }
+
+      .back-button {
+        background-color: #287272;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+        display: inline-block;
+        text-decoration: none;
+      }
+
+      .back-button:hover {
+        background-color: #1d5656;
+      }
+
+      .disclaimer {
+        background-color: #ff6666;
+        color: #1d3853;
+        padding: 15px;
+        border-radius: 5px;
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 30px;
+        border: 1px solid #d9534f;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="logo-profile">MindLoom</div>
+      <div class="nav-links-container">
+        <nav class="nav-links">
+          <a href="landing-page.html" class="active">Home</a>
+          <a href="dashboard.html" class="active">Dashboard</a>
+        </nav>
+      </div>
+      <a href="profile-settings.html" class="profile-link">
+        <div class="profile logo-profile">
+          <img
+            src="images/profile-pic.png"
+            alt="User Profile"
+            class="profile-img"
+          />
+          <span class="profile-name" id="profile-name">Login or Sign Up</span>
+        </div>
+      </a>
+    </header>
+
+    <div class="results-container" id="history-container">
+      <h1>Test Result History</h1>
+
+      <div class="disclaimer">
+        <strong>IMPORTANT NOTE</strong><br />
+        The tools and content provided are intended for use by healthcare
+        professionals. While these may be surveys or questions for patients,
+        they should be answered in the context of a clinician's medical care and
+        are not intended to be used alone to diagnose or treat any condition.
+      </div>
+
+      <!-- History items will be added here dynamically -->
+      <div class="history-list">
+        <!-- Loading indicator -->
+        <div class="result-section" id="loading-indicator">
+          <p>Loading your test history...</p>
+        </div>
+      </div>
+
+      <button
+        class="back-button"
+        onclick="window.location.href='dashboard.html'"
+      >
+        Back to Dashboard
+      </button>
+    </div>
+
+    <div class="footer">
+      <div class="footer-container">
+        <div class="footer-icons"></div>
+        <div class="footer-links">
+          <a href="contact-us.html">Contact Us</a>
+          <a href="terms-and-conditions.html">Terms & Privacy</a>
+          <a href="privacy-policy.html">Security</a>
+        </div>
+        <div class="footer-icons">
+          <a href="#"><img src="images/Facebook.png" alt="Facebook" /></a>
+          <a href="#"><img src="images/Twitter.png" alt="Twitter" /></a>
+          <a href="#"><img src="images/Instagram.png" alt="Instagram" /></a>
+        </div>
+      </div>
+    </div>
+
+    <script src="technical-history.js"></script>
+  </body>
+</html>

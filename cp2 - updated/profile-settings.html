@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="logo-profile">MindLoom</div>
+      <div class="nav-links-container">
+        <nav class="nav-links">
+          <a href="landing-page.html">Home</a>
+          <a href="dashboard.html" class="active">Dashboard</a>
+        </nav>
+      </div>
+      <div class="logo-profile"></div>
+    </header>
+
+    <section class="profile-header">
+      <h1>Profile Settings</h1>
+      <p>Please update your profile settings here</p>
+    </section>
+    <div class="profile-container">
+      <div class="profile-image-container">
+        <img src="images/profile-pic.png" alt="User Profile" />
+        <div class="profile-buttons">
+          <button class="profile-button profile-edit">Edit</button>
+          <button class="profile-button profile-delete">Delete</button>
+        </div>
+      </div>
+      <div class="profile-details">
+        <ul class="profile-details-list">
+          <li class="profile-details-list-item">
+            <p>Username</p>
+            <input type="text" id="username" value="John Doe" disabled />
+          </li>
+          <li class="profile-details-list-item">
+            <p>Phone Number</p>
+            <input type="text" id="phone" value="+60 123456754" disabled />
+          </li>
+          <li class="profile-details-list-item">
+            <p>Email Address</p>
+            <input type="text" id="email" value="John.Doe@gmail.com" disabled />
+          </li>
+        </ul>
+
+        <div class="button-container">
+          <button class="profile-button profile-save">Save</button>
+          <button class="profile-button profile-logout">Log Out</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-container">
+        <div class="footer-icons"></div>
+        <div class="footer-links">
+          <a href="contact-us.html">Contact Us</a>
+          <a href="terms-and-conditions.html">Terms & Privacy</a>
+          <a href="privacy-policy.html">Security</a>
+        </div>
+        <div class="footer-icons">
+          <a href="#"><img src="images/Facebook.png" alt="Facebook" /></a>
+          <a href="#"><img src="images/Twitter.png" alt="Twitter" /></a>
+          <a href="#"><img src="images/Instagram.png" alt="Instagram" /></a>
+        </div>
+      </div>
+    </div>
+
+    <script src="profile-settings.js"></script>
+
+  </body>
+</html>

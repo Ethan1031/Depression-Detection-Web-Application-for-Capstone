@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | MindLoom</title>
+    <link rel="stylesheet" href="styles.css">
+    <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div>MindLoom</div>
+        <nav class="nav-links-container">
+          <nav class="nav-links">
+            <a href="landing-page.html">Home</a>
+            <a href="dashboard.html" class="active">Dashboard</a>
+          </nav>
+        </nav>
+      </header>
+
+    <div class="container">
+        <div class="login-section">
+            <h2>Log in to your account</h2>
+            <p>Log in to continue your therapy journey towards a happier, healthier you.</p>
+            <form id="loginForm">
+                <label for="email">Email address<span>*</span></label>
+                <input type="email" id="email" placeholder="Email" required>
+
+                <label for="password">Password<span>*</span></label>
+                <input type="password" id="password" placeholder="Password" required>
+                <p class="password-instruction">Must be at least 8 characters, include one number & one special character.</p>
+
+                <a href="#" class="forgot-password">Forgot Password?</a>
+                
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember Me</label>
+                </div>
+
+                <button type="submit" class="login-btn">Log in</button>
+            </form>
+        </div>
+        
+        <div class="signup-section">
+            <h2>New Here?</h2>
+            <p>Sign up and start your journey.</p>
+            <a href="sign-up-page.html" class="signup-btn">Sign Up</a>
+        </div>
+
+        <div class="footer">
+          <div class="footer-container">
+            <div class="footer-icons"></div>
+            <div class="footer-links">
+              <a href="contact-us.html">Contact Us</a>
+              <a href="terms-and-conditions.html">Terms & Privacy</a>
+              <a href="privacy-policy.html">Security</a>
+            </div>
+            <div class="footer-icons">
+              <a href="#"><img src="images/Facebook.png" alt="Facebook"></a>
+              <a href="#"><img src="images/Twitter.png" alt="Twitter"></a>
+              <a href="#"><img src="images/Instagram.png" alt="Instagram"></a>
+            </div>
+          </div>
+        </div>
+        
+    </div>
+
+    <script src="auth.js"></script> 
+    
+</body>
+</html>
