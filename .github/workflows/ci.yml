@@ -10,12 +10,29 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
       DATABASE_HOSTNAME: localhost
       DATABASE_PORT: 5432
       DATABASE_PASSWORD: postgres
       DATABASE_NAME: test_db
       DATABASE_USERNAME: postgres
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
       SECRET_KEY: testsecretkey
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
