@@ -32,7 +32,17 @@ jobs:
         run: |
           curl https://cli-assets.heroku.com/install.sh | sh
           heroku container:login
-          heroku container:push web --recursive -a ${{ secrets.HEROKU_APP_NAME }}
+
+          # Check if app exists, create if it doesn't
+          if ! heroku apps:info -a ${{ secrets.HEROKU_APP_NAME }} &> /dev/null; then
+            echo "Creating new Heroku app: ${{ secrets.HEROKU_APP_NAME }}"
+            heroku apps:create ${{ secrets.HEROKU_APP_NAME }}
+          else
+            echo "Using existing Heroku app: ${{ secrets.HEROKU_APP_NAME }}"
+          fi
+
+          # Push and release container
+          heroku container:push web -a ${{ secrets.HEROKU_APP_NAME }}
           heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
