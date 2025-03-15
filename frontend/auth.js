@@ -1,7 +1,7 @@
 // Function to register the user with new fields
 async function registerUser(name, ic_number, phone_number, email, password) {
   try {
-    const response = await fetch("http://localhost:8000/api/auth/signup", {
+    const response = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -44,7 +44,7 @@ async function registerUser(name, ic_number, phone_number, email, password) {
 // Function to log in the user
 async function loginUser(email, password) {
   try {
-    const response = await fetch("http://localhost:8000/api/auth/login", {
+    const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email, password: password }),
@@ -79,7 +79,7 @@ async function fetchUserProfile() {
       return;
     }
 
-    const response = await fetch("http://localhost:8000/api/auth/profile", {
+    const response = await fetch("/api/auth/profile", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -115,7 +115,7 @@ async function verifyToken() {
   }
 
   try {
-    const response = await fetch("http://localhost:8000/api/auth/profile", {
+    const response = await fetch("/api/auth/profile", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
