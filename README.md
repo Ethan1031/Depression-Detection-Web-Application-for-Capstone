@@ -67,3 +67,5 @@ Run backend:
 uvicorn app.main:app --reload
 
 http://127.0.0.1:8000/health
+
+./run_tests.sh --skip-install

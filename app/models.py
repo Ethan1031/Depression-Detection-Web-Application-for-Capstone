@@ -14,7 +14,7 @@ class User(Base):
     phone_number = Column(String, nullable=False)
     password = Column(String, nullable=False)
     is_active = Column(Boolean, server_default='TRUE', nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     
     phq9_tests = relationship("PHQ9Test", back_populates="user")
     combined_assessments = relationship("CombinedAssessment", back_populates="user")
@@ -24,7 +24,7 @@ class PHQ9Test(Base):
     
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     
     # Store the answers to the 9 questions
     answers = Column(JSON, nullable=False)
@@ -43,7 +43,7 @@ class CombinedAssessment(Base):
 
     id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('CURRENT_TIMESTAMP'))
     
     # PHQ-9 related fields
     phq9_answers = Column(JSON, nullable=False)
