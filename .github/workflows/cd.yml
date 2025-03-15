@@ -21,7 +21,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image to Docker Hub
         uses: docker/build-push-action@v4
         with:
           context: .
@@ -30,10 +30,12 @@ jobs:
 
       - name: Deploy to Heroku
         run: |
+          # Install Heroku CLI
           curl https://cli-assets.heroku.com/install.sh | sh
+          # Log in to Heroku container registry
           heroku container:login
 
-          # Check if app exists, create if it doesn't
+          # Check if the Heroku app exists; create it if not
           if ! heroku apps:info -a ${{ secrets.HEROKU_APP_NAME }} &> /dev/null; then
             echo "Creating new Heroku app: ${{ secrets.HEROKU_APP_NAME }}"
             heroku apps:create ${{ secrets.HEROKU_APP_NAME }}
@@ -41,7 +43,7 @@ jobs:
             echo "Using existing Heroku app: ${{ secrets.HEROKU_APP_NAME }}"
           fi
 
-          # Push and release container
+          # Push Docker image to Heroku and release it
           heroku container:push web -a ${{ secrets.HEROKU_APP_NAME }}
           heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
         env:
