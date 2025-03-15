@@ -1,9 +1,9 @@
 fastapi
 uvicorn
 sqlalchemy
-psycopg2
-email-validator==2.1.0 
-pydanticgit 
+psycopg2-binary 
+email-validator==2.1.0
+pydantic 
 pydantic-settings
 python-jose[cryptography]
 passlib[bcrypt]
@@ -12,3 +12,8 @@ tensorflow
 numpy
 scipy
 mne
+pytest
+pylint 
+flake8
+alembic
+httpx
