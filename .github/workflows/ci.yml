@@ -44,10 +44,13 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Create necessary directories
+      - name: Create necessary directories and files
         run: |
           mkdir -p frontend/static
           touch frontend/landing-page.html
+          mkdir -p tests
+          touch tests/__init__.py
+          touch __init__.py
 
       - name: Install dependencies
         run: |
@@ -71,4 +74,4 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pytest tests/ --cov=app
+          python -m pytest tests/ --cov=app -v
