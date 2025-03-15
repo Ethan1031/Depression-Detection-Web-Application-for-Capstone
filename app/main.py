@@ -32,9 +32,15 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
 app.include_router(phq9_prediction.router, prefix="/api/assessment", tags=["Combined Assessment"])
 
-# Mount frontend static files
-# Assuming frontend files are in a directory named "frontend" at the project root
-app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+# Mount frontend static files only if the directory exists
+static_dir = "frontend/static"
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+else:
+    # Create the directory in development mode
+    if os.environ.get("ENVIRONMENT") != "production":
+        os.makedirs(static_dir, exist_ok=True)
+        app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 @app.get("/api", tags=["Root"])
 async def api_root():

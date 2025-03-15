@@ -19,7 +19,6 @@ jobs:
           POSTGRES_DB: test_db
         ports:
           - 5432:5432
-        # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -44,6 +43,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
+
+      - name: Create necessary directories
+        run: |
+          mkdir -p frontend/static
+          touch frontend/landing-page.html
 
       - name: Install dependencies
         run: |

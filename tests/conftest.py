@@ -4,10 +4,16 @@ import os
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # Add the parent directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Create necessary directories for tests
+os.makedirs("frontend/static", exist_ok=True)
+if not os.path.exists("frontend/landing-page.html"):
+    with open("frontend/landing-page.html", "w") as f:
+        f.write("<html><body>Test Frontend</body></html>")
 
 # Now import your app modules
 from app.database import Base, get_db
