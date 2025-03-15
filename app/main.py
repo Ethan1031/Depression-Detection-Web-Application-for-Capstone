@@ -85,19 +85,42 @@ async def serve_frontend(full_path: str):
 # Root endpoint to serve frontend landing-page.html
 @app.get("/")
 async def root():
-    frontend_path = "frontend/landing-page.html"
-    if os.path.exists(frontend_path):
-        return FileResponse(frontend_path)
-    else:
-        # Fallback to API info if frontend is not available
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "message": "Welcome to Depression Detection API",
-                "documentation": "/api/docs",
-                "note": "Frontend files not found. Please place your frontend files in the 'frontend' directory."
-            }
-        )
+    # Try multiple possible locations for the landing page
+    possible_paths = [
+        "frontend/landing-page.html",
+        "/app/frontend/landing-page.html",
+        "app/frontend/landing-page.html",
+        "./frontend/landing-page.html"
+    ]
+    
+    # Log the current directory and its contents for debugging
+    import os
+    current_dir = os.getcwd()
+    dir_contents = os.listdir(current_dir)
+    print(f"Current directory: {current_dir}")
+    print(f"Directory contents: {dir_contents}")
+    
+    # Try all possible paths
+    for path in possible_paths:
+        if os.path.exists(path):
+            print(f"Found landing page at: {path}")
+            return FileResponse(path)
+    
+    # If no frontend file is found, check if frontend directory exists
+    frontend_dir = "frontend"
+    if os.path.exists(frontend_dir):
+        frontend_contents = os.listdir(frontend_dir)
+        print(f"Frontend directory contents: {frontend_contents}")
+    
+    # Fallback to API info
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "message": "Welcome to Depression Detection API",
+            "documentation": "/api/docs",
+            "note": "Frontend files not found. Files being searched: " + str(possible_paths)
+        }
+    )
 
 if __name__ == "__main__":
     import uvicorn
