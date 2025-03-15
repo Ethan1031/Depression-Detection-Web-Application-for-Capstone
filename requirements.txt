@@ -17,3 +17,5 @@ pylint
 flake8
 alembic
 httpx
+opencv-python
+scikit-learn
