@@ -32,16 +32,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
 app.include_router(phq9_prediction.router, prefix="/api/assessment", tags=["Combined Assessment"])
 
-frontend_dir = "frontend"
-if os.path.exists(frontend_dir):
-    app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
-else:
-    print(f"Warning: Frontend directory '{frontend_dir}' not found!")
-    # Create directory in development mode
-    if os.environ.get("ENVIRONMENT") != "production":
-        os.makedirs(frontend_dir, exist_ok=True)
-        app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
-
+# API endpoints
 @app.get("/api", tags=["Root"])
 async def api_root():
     """
@@ -68,59 +59,57 @@ async def health_check():
     """
     return {"status": "healthy"}
 
-# Serve frontend for all non-API routes
-@app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
-    # If the path already starts with /api, raise a 404 error
-    if full_path.startswith("api/"):
-        raise HTTPException(status_code=404, detail="Not found")
-    
-    # For all other paths, serve the landing-page.html file from the frontend directory
-    frontend_path = "frontend/landing-page.html"
-    if os.path.exists(frontend_path):
-        return FileResponse(frontend_path)
-    else:
-        raise HTTPException(status_code=404, detail="Frontend not found")
+# Mount static files - do this separately for each type
+# Mount CSS files
+app.mount("/styles.css", StaticFiles(directory="frontend"), name="css")
+
+# Mount JavaScript files
+app.mount("/auth-check.js", StaticFiles(directory="frontend"), name="js")
+
+# Mount images directory
+if os.path.exists(os.path.join("frontend", "images")):
+    app.mount("/images", StaticFiles(directory="frontend/images"), name="images")
+
+# Mount specific HTML files
+app.mount("/profile-settings.html", StaticFiles(directory="frontend"), name="profile_settings")
+app.mount("/contact-us.html", StaticFiles(directory="frontend"), name="contact_us")
 
 # Root endpoint to serve frontend landing-page.html
 @app.get("/")
 async def root():
-    # Try multiple possible locations for the landing page
-    possible_paths = [
-        "frontend/landing-page.html",
-        "/app/frontend/landing-page.html",
-        "app/frontend/landing-page.html",
-        "./frontend/landing-page.html"
-    ]
+    # Try to find the landing page
+    frontend_path = "frontend/landing-page.html"
+    if os.path.exists(frontend_path):
+        return FileResponse(frontend_path)
+    else:
+        # Fallback if the file isn't found
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "message": "Welcome to Depression Detection API",
+                "documentation": "/api/docs",
+                "note": "Frontend files not found."
+            }
+        )
+
+# Catch-all route for other pages
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    # Skip API routes
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="Not found")
     
-    # Log the current directory and its contents for debugging
-    import os
-    current_dir = os.getcwd()
-    dir_contents = os.listdir(current_dir)
-    print(f"Current directory: {current_dir}")
-    print(f"Directory contents: {dir_contents}")
+    # Try to serve the specific file
+    file_path = os.path.join("frontend", full_path)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(file_path)
     
-    # Try all possible paths
-    for path in possible_paths:
-        if os.path.exists(path):
-            print(f"Found landing page at: {path}")
-            return FileResponse(path)
-    
-    # If no frontend file is found, check if frontend directory exists
-    frontend_dir = "frontend"
-    if os.path.exists(frontend_dir):
-        frontend_contents = os.listdir(frontend_dir)
-        print(f"Frontend directory contents: {frontend_contents}")
-    
-    # Fallback to API info
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content={
-            "message": "Welcome to Depression Detection API",
-            "documentation": "/api/docs",
-            "note": "Frontend files not found. Files being searched: " + str(possible_paths)
-        }
-    )
+    # Default to landing page for SPA-style navigation
+    landing_page = "frontend/landing-page.html"
+    if os.path.exists(landing_page):
+        return FileResponse(landing_page)
+    else:
+        raise HTTPException(status_code=404, detail="File not found")
 
 if __name__ == "__main__":
     import uvicorn
