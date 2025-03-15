@@ -16,10 +16,10 @@ COPY frontend/ ./frontend/
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV PORT=8000
+ENV ENVIRONMENT=production
 
-# Expose the port
-EXPOSE $PORT
+# The PORT variable will be dynamically set by Heroku
+# Don't hardcode it in the Dockerfile
 
-# Command to run the application
-CMD ["python", "-m", "app.main"]
+# Command to run the application using Uvicorn
+CMD uvicorn app.main:app --host 0.0.0.0 --port $PORT
