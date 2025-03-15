@@ -26,7 +26,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/eeg-depression-app:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/your-app-name:latest
 
       - name: Deploy to Heroku
         run: |
@@ -35,15 +35,22 @@ jobs:
           # Log in to Heroku container registry
           heroku container:login
 
-          # Check if the Heroku app exists; create it if not
+          # Check if the Heroku app exists
           if ! heroku apps:info -a ${{ secrets.HEROKU_APP_NAME }} &> /dev/null; then
             echo "Creating new Heroku app: ${{ secrets.HEROKU_APP_NAME }}"
             heroku apps:create ${{ secrets.HEROKU_APP_NAME }}
+            heroku stack:set container -a ${{ secrets.HEROKU_APP_NAME }}
           else
             echo "Using existing Heroku app: ${{ secrets.HEROKU_APP_NAME }}"
+            # Check the current stack
+            CURRENT_STACK=$(heroku stack -a ${{ secrets.HEROKU_APP_NAME }} --json | jq -r '.current')
+            if [ "$CURRENT_STACK" != "container" ]; then
+              echo "Switching stack to container"
+              heroku stack:set container -a ${{ secrets.HEROKU_APP_NAME }}
+            fi
           fi
 
-          # Push Docker image to Heroku and release it
+          # Push and release the Docker image to Heroku
           heroku container:push web -a ${{ secrets.HEROKU_APP_NAME }}
           heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
         env:
