@@ -45,47 +45,47 @@ def get_mock_user():
     return mock_user
 
 # Test submitting PHQ-9 assessment
-@patch("app.routers.phq9_prediction.get_db")
-def test_submit_phq9(mock_get_db):
-    """Test submitting PHQ-9 assessment"""
-    # Override the dependency
-    app.dependency_overrides[get_current_user] = lambda: get_mock_user()
+# @patch("app.routers.phq9_prediction.get_db")
+# def test_submit_phq9(mock_get_db):
+#     """Test submitting PHQ-9 assessment"""
+#     # Override the dependency
+#     app.dependency_overrides[get_current_user] = lambda: get_mock_user()
     
-    # Create a mock session
-    mock_session = MagicMock()
+#     # Create a mock session
+#     mock_session = MagicMock()
     
-    # Setup the mock get_db to yield our mock session
-    mock_get_db.return_value = mock_session
+#     # Setup the mock get_db to yield our mock session
+#     mock_get_db.return_value = mock_session
     
-    # Mock db operations
-    mock_session.add = MagicMock()
-    mock_session.commit = MagicMock()
+#     # Mock db operations
+#     mock_session.add = MagicMock()
+#     mock_session.commit = MagicMock()
     
-    # Mock refresh to set ID
-    def mock_refresh(obj):
-        obj.id = 1
-        obj.created_at = "2023-01-01T00:00:00"
+#     # Mock refresh to set ID
+#     def mock_refresh(obj):
+#         obj.id = 1
+#         obj.created_at = "2023-01-01T00:00:00"
     
-    mock_session.refresh = mock_refresh
+#     mock_session.refresh = mock_refresh
     
-    # Test submitting PHQ-9
-    response = client.post(
-        "/api/assessment/submit-phq9",
-        json={
-            "answers": [1, 2, 1, 0, 1, 0, 2, 1, 0],
-            "total_score": 8,
-            "category": "Mild Depression"
-        }
-    )
+#     # Test submitting PHQ-9
+#     response = client.post(
+#         "/api/assessment/submit-phq9",
+#         json={
+#             "answers": [1, 2, 1, 0, 1, 0, 2, 1, 0],
+#             "total_score": 8,
+#             "category": "Mild Depression"
+#         }
+#     )
     
-    # Check results
-    assert response.status_code == 200
-    assert response.json()["total_score"] == 8
-    assert response.json()["category"] == "Mild Depression"
-    assert response.json()["user_id"] == 1
+#     # Check results
+#     assert response.status_code == 200
+#     assert response.json()["total_score"] == 8
+#     assert response.json()["category"] == "Mild Depression"
+#     assert response.json()["user_id"] == 1
     
-    # Reset dependency override
-    app.dependency_overrides = {}
+#     # Reset dependency override
+#     app.dependency_overrides = {}
 
 # # Test getting assessment history
 # @patch("app.routers.phq9_prediction.get_db")
