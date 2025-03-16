@@ -31,17 +31,14 @@ async function fetchLatestAssessment() {
       return;
     }
 
-    // FIXED: Use the correct endpoint from your backend routing structure
-    const response = await fetch(
-      "http://localhost:8000/api/assessment/assessment-history?limit=1",
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    // FIXED: Use relative URL path
+    const response = await fetch("/api/assessment/assessment-history?limit=1", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
     if (response.ok) {
       const assessments = await response.json();

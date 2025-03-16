@@ -26,17 +26,14 @@ async function fetchTestHistory() {
       return;
     }
 
-    // FIXED: Use the correct API endpoint path based on main.py router configuration
-    const response = await fetch(
-      "http://localhost:8000/api/assessment/assessment-history",
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    // FIXED: Use relative URL path
+    const response = await fetch("/api/assessment/assessment-history", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
     if (response.ok) {
       const assessments = await response.json();
