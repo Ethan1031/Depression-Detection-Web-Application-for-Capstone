@@ -217,3 +217,24 @@ intended to be used alone to diagnose or treat any condition.
         }
     )
 
+@router.get("/latest-assessment-id")
+async def get_latest_assessment_id(
+    current_user: models.User = Depends(auth.get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get the ID of the user's latest assessment
+    """
+    latest_assessment = db.query(models.CombinedAssessment)\
+        .filter(models.CombinedAssessment.user_id == current_user.id)\
+        .order_by(models.CombinedAssessment.created_at.desc())\
+        .first()
+    
+    if not latest_assessment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No assessment found"
+        )
+    
+    return {"assessment_id": latest_assessment.id}
+

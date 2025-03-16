@@ -253,11 +253,7 @@
           <label class="upload-box" for="file-upload"
             >Browse files to upload</label
           >
-          <input
-            type="file"
-            id="file-upload"
-            accept=".edf"
-          />
+          <input type="file" id="file-upload" accept=".edf" />
           <p id="file-name">No file chosen</p>
           <button class="submit-btn">Submit</button>
         </div>
@@ -292,5 +288,19 @@
 
     <script src="eeg-upload.js"></script>
 
+    <script>
+      // Update the username display
+      document.addEventListener("DOMContentLoaded", function () {
+        const userData = JSON.parse(
+          localStorage.getItem("loggedInUser") || "{}"
+        );
+        if (userData.username) {
+          const userNameElement = document.querySelector(".profile-name");
+          if (userNameElement) {
+            userNameElement.textContent = userData.username;
+          }
+        }
+      });
+    </script>
   </body>
 </html>

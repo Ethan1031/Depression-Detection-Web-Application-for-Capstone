@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log("No assessment ID in localStorage, fetching from API");
           try {
             const idResponse = await fetch(
-              "/api/assessment/latest-assessment-id",
+              "/api/assessment/assessment-history?limit=1",
               {
                 method: "GET",
                 headers: {
@@ -43,13 +43,20 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             if (idResponse.ok) {
-              const idData = await idResponse.json();
-              assessmentId = idData.assessment_id;
-              console.log("Retrieved assessment ID from API:", assessmentId);
+              const assessments = await idResponse.json();
+              if (assessments && assessments.length > 0) {
+                assessmentId = assessments[0].id;
+                console.log(
+                  "Retrieved assessment ID from history:",
+                  assessmentId
+                );
+              } else {
+                throw new Error("No assessments found in your history");
+              }
             } else {
               const errorText = await idResponse.text();
-              console.error("Failed to get assessment ID:", errorText);
-              throw new Error("Failed to get assessment ID from API");
+              console.error("Failed to get assessment history:", errorText);
+              throw new Error("Failed to retrieve assessment data");
             }
           } catch (error) {
             console.error("Error getting assessment ID:", error);
@@ -69,8 +76,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("Downloading report for assessment ID:", assessmentId);
 
-        // Download the report using the ID
-        window.location.href = `/api/assessment/download-report/${assessmentId}`;
+        // Use fetch with authentication header to get the report
+        const response = await fetch(
+          `/api/assessment/download-report/${assessmentId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error("Download error:", errorData);
+          throw new Error("Failed to download report");
+        }
+
+        // Convert the response to a blob
+        const blob = await response.blob();
+
+        // Create a download link and trigger it
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = `mindloom_assessment_${
+          new Date().toISOString().split("T")[0]
+        }.txt`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
       } catch (error) {
         console.error("Error downloading report:", error);
         alert("Error downloading report: " + error.message);
