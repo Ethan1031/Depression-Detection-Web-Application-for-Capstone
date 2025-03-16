@@ -5,6 +5,7 @@ from ..database import get_db
 from ..ml.model import predict_api
 from typing import List
 import os
+import io
 
 from datetime import datetime 
 from reportlab.lib.pagesizes import letter
