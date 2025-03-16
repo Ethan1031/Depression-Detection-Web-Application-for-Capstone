@@ -61,21 +61,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       // Save PHQ-9 test to database
-      const response = await fetch(
-        "http://localhost:8000/api/assessment/submit-phq9",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            answers: phq9Answers,
-            total_score: totalScore,
-            category: severity,
-          }),
-        }
-      );
+      const response = await fetch("/api/assessment/submit-phq9", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          answers: phq9Answers,
+          total_score: totalScore,
+          category: severity,
+        }),
+      });
 
       const data = await response.json();
 

@@ -53,16 +53,13 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // Call the new combined endpoint
-      const response = await fetch(
-        "http://localhost:8000/api/assessment/submit-assessment",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch("/api/assessment/submit-assessment", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
       const data = await response.json();
 
