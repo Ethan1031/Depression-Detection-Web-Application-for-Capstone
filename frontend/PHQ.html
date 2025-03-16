@@ -439,7 +439,9 @@
         const userData = JSON.parse(
           localStorage.getItem("loggedInUser") || "{}"
         );
-        if (userData.username) {
+
+        // Check for name field (this is what's stored by auth.js)
+        if (userData.name) {
           const userNameElement = document.querySelector(".profile-name");
           if (userNameElement) {
             userNameElement.textContent = userData.name;
