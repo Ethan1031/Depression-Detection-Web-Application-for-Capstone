@@ -90,15 +90,18 @@ async function fetchUserProfile() {
     const data = await response.json();
 
     if (response.ok) {
-      // Store user profile data
+      // Store user profile data exactly as returned from the API
+      // This ensures the field names match between login and profile
       localStorage.setItem(
         "loggedInUser",
         JSON.stringify({
-          username: data.name,
-          phone: data.phone_number,
+          name: data.name,
+          phone_number: data.phone_number,
           email: data.email,
         })
       );
+
+      console.log("User profile data stored:", data);
     } else {
       console.error("Failed to fetch profile:", data.detail);
     }
