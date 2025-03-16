@@ -6,8 +6,7 @@ from ..ml.model import predict_api
 from typing import List
 import os
 import io
-
-from datetime import datetime 
+from datetime import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -152,6 +151,9 @@ async def download_assessment_report(
     current_user: models.User = Depends(auth.get_current_user),
     db: Session = Depends(get_db)
 ):
+    """
+    Generate and download a PDF report for a specific assessment
+    """
     # Get the assessment with the given ID
     assessment = db.query(models.CombinedAssessment)\
         .filter(models.CombinedAssessment.id == assessment_id, 
@@ -167,51 +169,160 @@ async def download_assessment_report(
     # Get user information
     user = db.query(models.User).filter(models.User.id == current_user.id).first()
     
-    # Create report content
+    # Create PDF report
+    buffer = io.BytesIO()
+    
+    # Create the PDF document using ReportLab
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=letter,
+        rightMargin=72, 
+        leftMargin=72,
+        topMargin=72, 
+        bottomMargin=72
+    )
+    
+    # Define styles
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'Title',
+        parent=styles['Heading1'],
+        fontSize=18,
+        alignment=1,  # Center alignment
+        spaceAfter=20,
+        textColor=colors.navy
+    )
+    
+    section_title_style = ParagraphStyle(
+        'SectionTitle',
+        parent=styles['Heading2'],
+        fontSize=16,
+        alignment=1,  # Center alignment
+        spaceAfter=10,
+        textColor=colors.teal
+    )
+    
+    label_style = ParagraphStyle(
+        'Label',
+        parent=styles['Normal'],
+        fontSize=12,
+        alignment=1,  # Center alignment
+        fontName='Helvetica-Bold',
+        textColor=colors.gray
+    )
+    
+    value_style = ParagraphStyle(
+        'Value',
+        parent=styles['Normal'],
+        fontSize=14,
+        alignment=1,  # Center alignment
+        spaceAfter=20,
+        textColor=colors.black
+    )
+    
+    table_header_style = ParagraphStyle(
+        'TableHeader',
+        parent=styles['Normal'],
+        fontSize=12,
+        fontName='Helvetica-Bold',
+        textColor=colors.white
+    )
+    
+    disclaimer_style = ParagraphStyle(
+        'Disclaimer',
+        parent=styles['Normal'],
+        fontSize=8,
+        textColor=colors.gray,
+        alignment=1  # Center alignment
+    )
+    
+    content = []
+    
+    # Report header and date
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    content.append(Paragraph("MINDLOOM ASSESSMENT REPORT", title_style))
+    content.append(Paragraph(f"Date: {current_date}", label_style))
+    content.append(Paragraph(f"User: {user.name}", label_style))
+    content.append(Spacer(1, 20))
     
-    # Format the report as text (simpler than PDF for testing)
-    report_content = f"""
-MINDLOOM ASSESSMENT REPORT
-==========================
-Date: {current_date}
-User: {user.name}
-
-PHQ-9 DEPRESSION SCREENING RESULTS
-----------------------------------
-Total Score: {assessment.phq9_score}/27
-Severity: {assessment.phq9_category}
-
-PHQ-9 Response Details:
-1. Little interest or pleasure in doing things: {assessment.phq9_answers[0]}
-2. Feeling down, depressed, or hopeless: {assessment.phq9_answers[1]}
-3. Trouble falling/staying asleep, sleeping too much: {assessment.phq9_answers[2]}
-4. Feeling tired or having little energy: {assessment.phq9_answers[3]}
-5. Poor appetite or overeating: {assessment.phq9_answers[4]}
-6. Feeling bad about yourself: {assessment.phq9_answers[5]}
-7. Trouble concentrating: {assessment.phq9_answers[6]}
-8. Moving or speaking slowly/being fidgety or restless: {assessment.phq9_answers[7]}
-9. Thoughts of hurting yourself: {assessment.phq9_answers[8]}
-
-EEG ANALYSIS RESULTS
--------------------
-Prediction: {assessment.prediction}
-Confidence: {assessment.confidence:.2f}%
-Segments Analyzed: {assessment.segments_analyzed}
-
-DISCLAIMER
-----------
-This report is intended for use by healthcare professionals. These assessments
-should be interpreted in the context of a clinician's medical care and are not 
-intended to be used alone to diagnose or treat any condition.
-"""
+    # PHQ-9 Results Section
+    content.append(Paragraph("PHQ-9 Test Result", section_title_style))
+    content.append(Paragraph("Total Score:", label_style))
+    content.append(Paragraph(f"{assessment.phq9_score}/27", value_style))
+    content.append(Paragraph("Severity:", label_style))
+    content.append(Paragraph(f"{assessment.phq9_category}", value_style))
+    content.append(Spacer(1, 20))
+    
+    # CNN-LSTM Model Result Section
+    content.append(Paragraph("CNN-LSTM Model Result", section_title_style))
+    content.append(Paragraph(f"{assessment.prediction}", value_style))
+    
+    # Add confidence bar (as text representation since we can't easily do graphical bars)
+    content.append(Paragraph("Confidence:", label_style))
+    confidence_percentage = assessment.confidence
+    if confidence_percentage > 1:  # If confidence is stored as percentage (e.g., 90 instead of 0.9)
+        confidence_text = f"{confidence_percentage:.2f}%"
+    else:
+        confidence_text = f"{confidence_percentage * 100:.2f}%"
+    content.append(Paragraph(confidence_text, value_style))
+    content.append(Spacer(1, 20))
+    
+    # PHQ-9 Depression Scale Table
+    content.append(Paragraph("PHQ-9 Depression Scale", section_title_style))
+    
+    # Create table data
+    table_data = [
+        [Paragraph("Score Range", table_header_style), Paragraph("Depression Severity", table_header_style)],
+        ["0-4", "Minimal"],
+        ["5-9", "Mild"],
+        ["10-14", "Moderate"],
+        ["15-19", "Moderately Severe"],
+        ["20-27", "Severe"]
+    ]
+    
+    # Create table
+    table = Table(table_data, colWidths=[200, 200])
+    
+    # Style the table
+    table.setStyle(TableStyle([
+        # Headers
+        ('BACKGROUND', (0, 0), (1, 0), colors.teal),
+        ('TEXTCOLOR', (0, 0), (1, 0), colors.white),
+        ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (1, 0), 12),
+        # Cells
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('ALIGN', (0, 1), (-1, -1), 'CENTER'),
+        # Grid
+        ('GRID', (0, 0), (-1, -1), 1, colors.gray),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    
+    content.append(table)
+    content.append(Spacer(1, 30))
+    
+    # Disclaimer
+    disclaimer_text = """
+    DISCLAIMER: This report is intended for use by healthcare professionals. 
+    These assessments should be interpreted in the context of a clinician's medical care 
+    and are not intended to be used alone to diagnose or treat any condition.
+    """
+    content.append(Paragraph(disclaimer_text, disclaimer_style))
+    
+    # Build the PDF
+    doc.build(content)
+    
+    # Move buffer position to the beginning
+    buffer.seek(0)
+    
     # Generate filename
-    filename = f"mindloom_assessment_{assessment_id}_{datetime.now().strftime('%Y%m%d')}.txt"
+    filename = f"mindloom_assessment_{assessment_id}_{datetime.now().strftime('%Y%m%d')}.pdf"
     
-    # Return as downloadable file
+    # Return as downloadable PDF file
     return Response(
-        content=report_content,
-        media_type="text/plain",
+        content=buffer.getvalue(),
+        media_type="application/pdf",
         headers={
             "Content-Disposition": f"attachment; filename={filename}"
         }
