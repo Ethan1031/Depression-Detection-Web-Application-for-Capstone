@@ -19,3 +19,4 @@ alembic
 httpx
 opencv-python-headless
 scikit-learn
+reportlab

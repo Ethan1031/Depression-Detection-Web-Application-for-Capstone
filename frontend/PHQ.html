@@ -415,7 +415,6 @@
       <button class="calculate-button">Upload</button>
     </div>
 
-
     <div class="footer">
       <div class="footer-container">
         <div class="footer-icons"></div>
@@ -434,5 +433,19 @@
 
     <script src="phq.js"></script>
 
+    <script>
+      // Update the username display
+      document.addEventListener("DOMContentLoaded", function () {
+        const userData = JSON.parse(
+          localStorage.getItem("loggedInUser") || "{}"
+        );
+        if (userData.username) {
+          const userNameElement = document.querySelector(".profile-name");
+          if (userNameElement) {
+            userNameElement.textContent = userData.username;
+          }
+        }
+      });
+    </script>
   </body>
 </html>

@@ -1,25 +1,41 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // Get user info
-  const userData = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
-  if (userData.username) {
-    const userNameElement = document.getElementById("user-name");
-    if (userNameElement) {
-      userNameElement.textContent = userData.username;
+// Replace the existing download button event listener with this:
+const downloadButton = document.getElementById("download-report");
+if (downloadButton) {
+  downloadButton.addEventListener("click", async function (e) {
+    e.preventDefault();
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You need to be logged in to download reports.");
+        return;
+      }
+
+      // Get the latest assessment ID
+      const idResponse = await fetch("/api/assessment/latest-assessment-id", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!idResponse.ok) {
+        const errorData = await idResponse.json();
+        throw new Error(errorData.detail || "Failed to get assessment ID");
+      }
+
+      const idData = await idResponse.json();
+      const assessmentId = idData.assessment_id;
+
+      // Download the report using the ID
+      window.location.href = `/api/assessment/download-report/${assessmentId}`;
+    } catch (error) {
+      console.error("Error downloading report:", error);
+      alert("Error downloading report: " + error.message);
     }
-  }
-
-  // Fetch the latest assessment data - this is the main function we call
-  fetchLatestAssessment();
-
-  // Configure download button
-  const downloadButton = document.getElementById("download-report");
-  if (downloadButton) {
-    downloadButton.addEventListener("click", function (e) {
-      e.preventDefault();
-      alert("Report generation feature will be available soon.");
-    });
-  }
-});
+  });
+}
 
 // Function to fetch the latest assessment from the API
 async function fetchLatestAssessment() {
