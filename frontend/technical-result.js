@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
         a.href = url;
         a.download = `mindloom_assessment_${
           new Date().toISOString().split("T")[0]
-        }.txt`;
+        }.pdf`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
