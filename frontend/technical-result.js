@@ -1,41 +1,83 @@
-// Replace the existing download button event listener with this:
-const downloadButton = document.getElementById("download-report");
-if (downloadButton) {
-  downloadButton.addEventListener("click", async function (e) {
-    e.preventDefault();
-
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("You need to be logged in to download reports.");
-        return;
-      }
-
-      // Get the latest assessment ID
-      const idResponse = await fetch("/api/assessment/latest-assessment-id", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!idResponse.ok) {
-        const errorData = await idResponse.json();
-        throw new Error(errorData.detail || "Failed to get assessment ID");
-      }
-
-      const idData = await idResponse.json();
-      const assessmentId = idData.assessment_id;
-
-      // Download the report using the ID
-      window.location.href = `/api/assessment/download-report/${assessmentId}`;
-    } catch (error) {
-      console.error("Error downloading report:", error);
-      alert("Error downloading report: " + error.message);
+document.addEventListener("DOMContentLoaded", function () {
+  // Get user info
+  const userData = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+  if (userData.username) {
+    const userNameElement = document.getElementById("user-name");
+    if (userNameElement) {
+      userNameElement.textContent = userData.username;
     }
-  });
-}
+  }
+
+  // Fetch the latest assessment data - this is the main function we call
+  fetchLatestAssessment();
+
+  // Configure download button
+  const downloadButton = document.getElementById("download-report");
+  if (downloadButton) {
+    downloadButton.addEventListener("click", async function (e) {
+      e.preventDefault();
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          alert("You need to be logged in to download reports.");
+          return;
+        }
+
+        // Try to get the assessment ID from localStorage first (most reliable)
+        let assessmentId = localStorage.getItem("latestAssessmentId");
+
+        // If no ID in localStorage, try to get it from the API
+        if (!assessmentId) {
+          console.log("No assessment ID in localStorage, fetching from API");
+          try {
+            const idResponse = await fetch(
+              "/api/assessment/latest-assessment-id",
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            if (idResponse.ok) {
+              const idData = await idResponse.json();
+              assessmentId = idData.assessment_id;
+              console.log("Retrieved assessment ID from API:", assessmentId);
+            } else {
+              const errorText = await idResponse.text();
+              console.error("Failed to get assessment ID:", errorText);
+              throw new Error("Failed to get assessment ID from API");
+            }
+          } catch (error) {
+            console.error("Error getting assessment ID:", error);
+            alert(
+              "Could not find your assessment. Please complete a PHQ-9 assessment first."
+            );
+            return;
+          }
+        }
+
+        if (!assessmentId) {
+          alert(
+            "No assessment found. Please complete a PHQ-9 assessment first."
+          );
+          return;
+        }
+
+        console.log("Downloading report for assessment ID:", assessmentId);
+
+        // Download the report using the ID
+        window.location.href = `/api/assessment/download-report/${assessmentId}`;
+      } catch (error) {
+        console.error("Error downloading report:", error);
+        alert("Error downloading report: " + error.message);
+      }
+    });
+  }
+});
 
 // Function to fetch the latest assessment from the API
 async function fetchLatestAssessment() {
@@ -47,7 +89,10 @@ async function fetchLatestAssessment() {
       return;
     }
 
-    // FIXED: Use relative URL path
+    // Add logging to help troubleshoot
+    console.log("Fetching latest assessment data with token");
+
+    // FIXED: Use relative URL path with better logging
     const response = await fetch("/api/assessment/assessment-history?limit=1", {
       method: "GET",
       headers: {
@@ -56,18 +101,25 @@ async function fetchLatestAssessment() {
       },
     });
 
+    // Log the raw response for debugging
+    console.log("Response status:", response.status);
+
     if (response.ok) {
       const assessments = await response.json();
       console.log("Fetched assessment data:", assessments);
 
       if (assessments && assessments.length > 0) {
         const latestAssessment = assessments[0];
+        console.log("Using latest assessment:", latestAssessment);
 
         // Store the latest assessment in localStorage with proper format
         localStorage.setItem(
           "assessmentResult",
           JSON.stringify(latestAssessment)
         );
+
+        // Also store the assessment ID for the download functionality
+        localStorage.setItem("latestAssessmentId", latestAssessment.id);
 
         // Update the display with the latest data
         updateDisplayWithAssessment(latestAssessment);
@@ -76,10 +128,9 @@ async function fetchLatestAssessment() {
         displayLocalStorageData();
       }
     } else {
-      console.error(
-        "Failed to fetch assessment history:",
-        await response.text()
-      );
+      // Log the error response for debugging
+      const errorText = await response.text();
+      console.error("Failed to fetch assessment history:", errorText);
       displayLocalStorageData(); // Fall back to localStorage if API fails
     }
   } catch (error) {
@@ -157,27 +208,32 @@ function displayPhq9Data(score, severity) {
   const scoreElement = document.getElementById("phq9-score");
   const severityElement = document.getElementById("phq9-severity");
 
-  if (score !== undefined && score !== null) {
+  if (scoreElement && score !== undefined && score !== null) {
     // Format and display the score
     scoreElement.textContent = score + "/27";
 
     // If we have severity, display it
-    if (severity) {
-      severityElement.textContent = severity;
-    } else {
-      // Otherwise calculate severity based on score
-      let calculatedSeverity = "Minimal Depression";
-      if (score >= 20) calculatedSeverity = "Severe Depression";
-      else if (score >= 15) calculatedSeverity = "Moderately Severe Depression";
-      else if (score >= 10) calculatedSeverity = "Moderate Depression";
-      else if (score >= 5) calculatedSeverity = "Mild Depression";
+    if (severityElement) {
+      if (severity) {
+        severityElement.textContent = severity;
+      } else {
+        // Otherwise calculate severity based on score
+        let calculatedSeverity = "Minimal Depression";
+        if (score >= 20) calculatedSeverity = "Severe Depression";
+        else if (score >= 15)
+          calculatedSeverity = "Moderately Severe Depression";
+        else if (score >= 10) calculatedSeverity = "Moderate Depression";
+        else if (score >= 5) calculatedSeverity = "Mild Depression";
 
-      severityElement.textContent = calculatedSeverity;
+        severityElement.textContent = calculatedSeverity;
+      }
     }
-  } else {
+  } else if (scoreElement) {
     // If no score is available
     scoreElement.textContent = "No PHQ-9 test taken";
-    severityElement.textContent = "Not available";
+    if (severityElement) {
+      severityElement.textContent = "Not available";
+    }
   }
 }
 
@@ -187,7 +243,7 @@ function displayModelResult(prediction, confidence) {
   const confidenceElement = document.getElementById("confidence-percentage");
   const confidenceFill = document.getElementById("confidence-fill");
 
-  if (prediction) {
+  if (modelResultElement && prediction) {
     modelResultElement.textContent = prediction;
 
     // Handle confidence display if available
@@ -205,7 +261,7 @@ function displayModelResult(prediction, confidence) {
       if (confidenceElement) confidenceElement.textContent = "N/A";
       if (confidenceFill) confidenceFill.style.width = "0%";
     }
-  } else {
+  } else if (modelResultElement) {
     modelResultElement.textContent = "No EEG analysis performed";
     if (confidenceElement) confidenceElement.textContent = "N/A";
     if (confidenceFill) confidenceFill.style.width = "0%";

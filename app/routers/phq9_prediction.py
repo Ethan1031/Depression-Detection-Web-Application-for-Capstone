@@ -146,7 +146,6 @@ def delete_assessment(
     db.commit()
     return {"message": "Assessment deleted successfully"}
 
-
 @router.get("/download-report/{assessment_id}")
 async def download_assessment_report(
     assessment_id: int,
@@ -171,119 +170,48 @@ async def download_assessment_report(
     # Create report content
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # Create a file-like object to receive PDF data
-    buffer = io.BytesIO()
-    
-    # Create the PDF document using ReportLab
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
-    styles = getSampleStyleSheet()
-    
-    # Create custom styles
-    title_style = ParagraphStyle(
-        'Title',
-        parent=styles['Heading1'],
-        fontName='Helvetica-Bold',
-        fontSize=16,
-        spaceAfter=12
-    )
-    
-    heading_style = ParagraphStyle(
-        'Heading',
-        parent=styles['Heading2'],
-        fontName='Helvetica-Bold',
-        fontSize=14,
-        spaceAfter=10,
-        spaceBefore=10
-    )
-    
-    normal_style = styles["Normal"]
-    
-    # Build the document content
-    content = []
-    
-    # Title
-    content.append(Paragraph("MINDLOOM ASSESSMENT REPORT", title_style))
-    content.append(Spacer(1, 12))
-    
-    # User info and date
-    content.append(Paragraph(f"Date: {current_date}", normal_style))
-    content.append(Paragraph(f"User: {user.name}", normal_style))
-    content.append(Spacer(1, 12))
-    
-    # PHQ-9 Section
-    content.append(Paragraph("PHQ-9 DEPRESSION SCREENING RESULTS", heading_style))
-    content.append(Paragraph(f"Total Score: {assessment.phq9_score}/27", normal_style))
-    content.append(Paragraph(f"Severity: {assessment.phq9_category}", normal_style))
-    content.append(Spacer(1, 6))
-    
-    # PHQ-9 Answers Table
-    phq9_questions = [
-        "Little interest or pleasure in doing things",
-        "Feeling down, depressed, or hopeless",
-        "Trouble falling/staying asleep, sleeping too much",
-        "Feeling tired or having little energy",
-        "Poor appetite or overeating",
-        "Feeling bad about yourself",
-        "Trouble concentrating",
-        "Moving or speaking slowly/being fidgety or restless",
-        "Thoughts of hurting yourself"
-    ]
-    
-    phq9_data = [["Question", "Score"]]
-    for i, question in enumerate(phq9_questions):
-        phq9_data.append([f"{i+1}. {question}", str(assessment.phq9_answers[i])])
-    
-    phq9_table = Table(phq9_data, colWidths=[350, 60])
-    phq9_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (1, 0), colors.lightgrey),
-        ('TEXTCOLOR', (0, 0), (1, 0), colors.black),
-        ('ALIGN', (0, 0), (1, 0), 'CENTER'),
-        ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    ]))
-    
-    content.append(phq9_table)
-    content.append(Spacer(1, 12))
-    
-    # EEG Analysis Section
-    content.append(Paragraph("EEG ANALYSIS RESULTS", heading_style))
-    content.append(Paragraph(f"Prediction: {assessment.prediction}", normal_style))
-    content.append(Paragraph(f"Confidence: {assessment.confidence:.2f}%", normal_style))
-    content.append(Paragraph(f"Segments Analyzed: {assessment.segments_analyzed}", normal_style))
-    content.append(Spacer(1, 12))
-    
-    # Disclaimer
-    disclaimer_style = ParagraphStyle(
-        'Disclaimer',
-        parent=styles['Normal'],
-        fontSize=8,
-        textColor=colors.grey
-    )
-    
-    disclaimer_text = """
-    DISCLAIMER: This report is intended for use by healthcare professionals. 
-    These assessments should be interpreted in the context of a clinician's medical care 
-    and are not intended to be used alone to diagnose or treat any condition.
-    """
-    
-    content.append(Paragraph(disclaimer_text, disclaimer_style))
-    
-    # Build the PDF
-    doc.build(content)
-    
-    # Move buffer position to the beginning
-    buffer.seek(0)
-    
+    # Format the report as text (simpler than PDF for testing)
+    report_content = f"""
+MINDLOOM ASSESSMENT REPORT
+==========================
+Date: {current_date}
+User: {user.name}
+
+PHQ-9 DEPRESSION SCREENING RESULTS
+----------------------------------
+Total Score: {assessment.phq9_score}/27
+Severity: {assessment.phq9_category}
+
+PHQ-9 Response Details:
+1. Little interest or pleasure in doing things: {assessment.phq9_answers[0]}
+2. Feeling down, depressed, or hopeless: {assessment.phq9_answers[1]}
+3. Trouble falling/staying asleep, sleeping too much: {assessment.phq9_answers[2]}
+4. Feeling tired or having little energy: {assessment.phq9_answers[3]}
+5. Poor appetite or overeating: {assessment.phq9_answers[4]}
+6. Feeling bad about yourself: {assessment.phq9_answers[5]}
+7. Trouble concentrating: {assessment.phq9_answers[6]}
+8. Moving or speaking slowly/being fidgety or restless: {assessment.phq9_answers[7]}
+9. Thoughts of hurting yourself: {assessment.phq9_answers[8]}
+
+EEG ANALYSIS RESULTS
+-------------------
+Prediction: {assessment.prediction}
+Confidence: {assessment.confidence:.2f}%
+Segments Analyzed: {assessment.segments_analyzed}
+
+DISCLAIMER
+----------
+This report is intended for use by healthcare professionals. These assessments
+should be interpreted in the context of a clinician's medical care and are not 
+intended to be used alone to diagnose or treat any condition.
+"""
     # Generate filename
-    filename = f"mindloom_assessment_{assessment_id}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    filename = f"mindloom_assessment_{assessment_id}_{datetime.now().strftime('%Y%m%d')}.txt"
     
-    # Return as downloadable PDF file
+    # Return as downloadable file
     return Response(
-        content=buffer.getvalue(),
-        media_type="application/pdf",
+        content=report_content,
+        media_type="text/plain",
         headers={
             "Content-Disposition": f"attachment; filename={filename}"
         }
