@@ -137,3 +137,12 @@ class PHQ9Response(BaseModel):
 
     class Config:
         orm_mode = True
+
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
+    phone_number: Optional[str] = None
+    password: Optional[str] = None
+    
+    class Config:
+        from_attributes = True

@@ -15,9 +15,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
 
   if (user) {
-    usernameInput.value = user.username;
-    phoneInput.value = user.phone;
-    emailInput.value = user.email;
+    // Map the fields correctly based on your schema
+    usernameInput.value = user.name || "";
+    phoneInput.value = user.phone_number || "";
+    emailInput.value = user.email || "";
   } else {
     alert("No user data found! Redirecting to login...");
     window.location.href = "log-in-page.html"; // No leading slash
@@ -29,33 +30,111 @@ document.addEventListener("DOMContentLoaded", function () {
       usernameInput.disabled = false;
       phoneInput.disabled = false;
       emailInput.disabled = false;
+      saveButton.style.display = "inline-block";
     });
   }
 
-  // Clear input fields when clicking "Delete"
+  // Delete account when clicking "Delete"
   if (deleteButton) {
-    deleteButton.addEventListener("click", function () {
-      usernameInput.value = "";
-      phoneInput.value = "";
-      emailInput.value = "";
+    deleteButton.addEventListener("click", async function () {
+      if (
+        confirm(
+          "Are you sure you want to delete your account? This action cannot be undone."
+        )
+      ) {
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            alert("You must be logged in to delete your account");
+            return;
+          }
+
+          const response = await fetch("/api/users/delete", {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (response.ok) {
+            // Clear all auth data
+            localStorage.removeItem("loggedInUser");
+            localStorage.removeItem("token");
+            localStorage.removeItem("phq9Score");
+            localStorage.removeItem("phq9Answers");
+            localStorage.removeItem("phq9Severity");
+            localStorage.removeItem("modelResult");
+            localStorage.removeItem("assessmentResult");
+
+            alert("Account deleted successfully");
+            window.location.href = "log-in-page.html";
+          } else {
+            const errorData = await response.json();
+            alert(
+              "Failed to delete account: " +
+                (errorData.detail || "Unknown error")
+            );
+          }
+        } catch (error) {
+          console.error("Error deleting account:", error);
+          alert("Error deleting account: " + error.message);
+        }
+      }
     });
   }
 
-  // Save changes and update localStorage
+  // Save changes to API and update localStorage
   if (saveButton) {
-    saveButton.addEventListener("click", function () {
-      const updatedUser = {
-        username: usernameInput.value,
-        phone: phoneInput.value,
-        email: emailInput.value,
-      };
+    saveButton.addEventListener("click", async function () {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          alert("You must be logged in to update your profile");
+          return;
+        }
 
-      localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
-      usernameInput.disabled = true;
-      phoneInput.disabled = true;
-      emailInput.disabled = true;
+        // Map the fields correctly based on your schema
+        const updatedUser = {
+          name: usernameInput.value,
+          phone_number: phoneInput.value,
+          email: emailInput.value,
+        };
 
-      alert("Profile saved successfully!");
+        // Send update to backend
+        const response = await fetch("/api/users/me", {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedUser),
+        });
+
+        if (response.ok) {
+          // Get updated user from response
+          const updatedUserData = await response.json();
+
+          // Update localStorage with new data
+          localStorage.setItem("loggedInUser", JSON.stringify(updatedUserData));
+
+          // Disable form fields
+          usernameInput.disabled = true;
+          phoneInput.disabled = true;
+          emailInput.disabled = true;
+          saveButton.style.display = "none";
+
+          alert("Profile saved successfully!");
+        } else {
+          const errorData = await response.json();
+          alert(
+            "Failed to update profile: " + (errorData.detail || "Unknown error")
+          );
+        }
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("Error updating profile: " + error.message);
+      }
     });
   }
 
