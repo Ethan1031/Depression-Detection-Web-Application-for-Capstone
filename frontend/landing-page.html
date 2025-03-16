@@ -99,5 +99,21 @@
         </div>
       </div>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Update the username display
+        const userData = JSON.parse(
+          localStorage.getItem("loggedInUser") || "{}"
+        );
+
+        if (userData.name) {
+          const userNameElement = document.querySelector(".profile-name");
+          if (userNameElement) {
+            userNameElement.textContent = userData.name;
+          }
+        }
+      });
+    </script>
   </body>
 </html>

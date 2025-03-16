@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Get user info
   const userData = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
-  if (userData.username) {
+  if (userData.name) {
     const userNameElement = document.getElementById("user-name");
     if (userNameElement) {
-      userNameElement.textContent = userData.username;
+      userNameElement.textContent = userData.name;
     }
   }
 

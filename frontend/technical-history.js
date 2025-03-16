@@ -11,8 +11,8 @@ function updateUserProfile() {
   const userData = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
   const profileNameEl = document.getElementById("profile-name");
 
-  if (userData.username && profileNameEl) {
-    profileNameEl.textContent = userData.username;
+  if (userData.name && profileNameEl) {
+    profileNameEl.textContent = userData.name;
   }
 }
 
