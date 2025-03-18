@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security | MindLoom</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div>MindLoom</div>
+        <nav class="nav-links-container">
+            <div class="nav-links">
+                <a href="landing-page.html">Home</a>
+                <a href="dashboard.html">Dashboard</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Security Section -->
+    <div class="terms-container">
+        <h1>Security</h1>
+        <p><strong>Effective Date:</strong> 6th March 2025</p>
+        <p><strong>Last Updated:</strong> 6th March 2025</p>
+
+        <p>At MindLoom, protecting your data and ensuring the security of our platform is our top priority. This page outlines our security measures, compliance standards, and best practices.</p>
+
+        <h2>1. Data Encryption</h2>
+        <p>All user data, including PHQ-9 test results and medical insights, is encrypted using industry-standard AES-256 encryption.</p>
+
+        <h2>2. Secure Authentication</h2>
+        <ul>
+            <li>We use two-factor authentication (2FA) for enhanced login security.</li>
+            <li>Passwords are stored using bcrypt hashing.</li>
+            <li>Account activity logs are monitored to detect unauthorized access.</li>
+        </ul>
+
+        <h2>3. Compliance Standards</h2>
+        <p>MindLoom follows security compliance frameworks, including:</p>
+        <ul>
+            <li><strong>PDPA Malaysia</strong> - Aligns with Malaysia’s Personal Data Protection Act.</li>
+        </ul>
+
+        <h2>4. Data Access and User Control</h2>
+        <p>You have full control over your personal data:</p>
+        <ul>
+            <li>View, update, or delete your data through your profile settings.</li>
+            <li>Request data export in compliance with PDPA.</li>
+            <li>Opt out of non-essential data collection.</li>
+        </ul>
+
+        <h2>5. Threat Detection and Monitoring</h2>
+        <p>We actively monitor for potential cyber threats:</p>
+        <ul>
+            <li>24/7 security monitoring and intrusion detection.</li>
+            <li>Automated alerts for suspicious login attempts.</li>
+            <li>Regular penetration testing and security audits.</li>
+        </ul>
+
+        <h2>6. Responsible Disclosure</h2>
+        <p>If you discover a security vulnerability, we encourage responsible disclosure. Report security issues to:</p>
+        <p>📧 security@mindloom.com</p>
+
+        <h2>7. Data Retention Policy</h2>
+        <p>MindLoom retains personal data only for as long as necessary to fulfill the purposes outlined in our Privacy Policy. We securely delete or anonymize data after:</p>
+        <ul>
+        <li>Inactive accounts: 2 years from the last login date.</li>
+        <li>PHQ-9 test results: 1 year after submission unless required for medical purposes.</li>
+        <li>Financial transactions: 5 years to comply with legal and tax obligations.</li>
+        </ul>
+        <p>If you request account deletion, your personal data will be erased within 30 days, except where legally required.</p>
+
+
+        <h2>8. Security Breach Notification</h2>
+        <p>In the event of a data breach affecting your personal data, MindLoom will:</p>
+        <ul>
+        <li>Notify affected users via email within 72 hours.</li>
+        <li>Take immediate action to contain and mitigate the breach.</li>
+        <li>Report serious breaches to the **Personal Data Protection Department Malaysia (JPDP)** as required by law.</li>
+        </ul>
+
+
+        <h2>9. Report a Security Issue</h2>
+        <p>MindLoom takes security seriously. If you encounter a security issue, suspect unauthorized access, or experience a data privacy concern, please report it immediately.</p>
+
+        <h3>How to Report</h3>
+        <li>📞 Phone: +601 342 0690 (Monday–Friday, 9 AM–6 PM MYT)</li>
+        <p><a href="#report"><u>Submit a Report</u></a></p> <!-- Link to the form -->
+    </div>
+
+    <!-- Security Report Form -->
+    <div id="report" class="terms-container">
+        <h2>Submit a Security Report</h2>
+        <p>If you encounter any security concerns, please fill out the form below.</p>
+
+        <form id="securityReportForm" action="https://formsubmit.co/mindloom77@gmail.com" method="POST">
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Your Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="issue">Describe the Issue:</label>
+            <textarea id="issue" name="issue" rows="5" required></textarea>
+
+            <button type="submit">Submit Report</button>
+        </form>
+    </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-container">
+            <div class="footer-icons"></div>
+            <div class="footer-links">
+                <a href="contact-us.html">Contact Us</a>
+                <a href="terms-and-conditions.html">Terms & Privacy</a>
+                <a href="security.html">Security</a>
+                <a href="privacy-policy.html">Privacy Policy</a>
+            </div>
+            <div class="footer-icons">
+                <a href="#"><img src="images/Facebook.png" alt="Facebook"></a>
+                <a href="#"><img src="images/Twitter.png" alt="Twitter"></a>
+                <a href="#"><img src="images/Instagram.png" alt="Instagram"></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Form Handling -->
+    <script>
+        document.getElementById("securityReportForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Your report has been submitted successfully!");
+                    form.reset(); // Clear form after successful submission
+                } else {
+                    alert("There was an issue submitting your report. Please try again.");
+                }
+            })
+            .catch(error => {
+                alert("An error occurred. Please check your internet connection.");
+            });
+        });
+    </script>
+
+</body>
+</html>
